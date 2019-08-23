@@ -15,9 +15,21 @@ class Game :
         self.rollList = [ 0 ]
         self.rankList = [ 0 ]
         self.dice1 = Die( 6 )
+        self.firstOpen = True
 
-    def gameStart( self ) :
-        print("Welcome to Mexico! Enjoy your game! \nHow many players?")
+    def newGame( self ) :
+        self.numPlayers = 1
+        self.playerList = [ 0 ]
+        self.livesList = [ 0 ]
+        self.rollList = [ 0 ]
+        self.rankList = [ 0 ]
+        self.dice1 = Die( 6 )
+        self.firstOpen = True
+        self.getPlayers()
+
+    def continuePrompt( self ) :
+        nothingMatters = input("Press any key to continue\n")
+        print("\r")
 
     def printMexicoFlag( self ) :
         print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
@@ -81,28 +93,49 @@ class Game :
         print(" (|  |)")
         print("  (  )")
         print("  _)(_")
+        print("\nTrophy or Frog: You Decide!")
 
     def printScoreboard( self ) :
-        print("here's a list of everyone's life count")
+        print("Here's a list of everyone's life count")
+        line1 = "| Player: | "
+        line2 = "|         | "
+        line3 = "-----------"
+        line4 = "| Lives:  | "
+        line5 = "|         | "
+        for i in range( 0, self.numPlayers ) :
+            line1 = line1 + str( ( i + 1 ) ) + " | "
+            line2 = line2 + "  | "
+            line3 = line3 + "----"
+            line4 = line4 + str( self.livesList[ i ] ) + " | "
+            line5 = line5 + "  | "
+        print(line1)
+        print(line2)
+        print(line3)
+        print(line4)
+        print(line5)
 
     def getPlayers( self ) :
-        self.numPlayers = int( raw_input() )
+        userInputNumb = ""
+        if self.firstOpen :
+            userInputNumb = input("Welcome to Mexico! Enjoy your game! \nHow many players?\n")
+        else :
+            userInputNumb = input()
+        self.numPlayers = int( userInputNumb )
+        self.firstOpen = False
         if self.numPlayers < 2 :
-            print("Please try again, that number is invalid \nHow many players?")
-            getPlayers()
+            print("Please try again, that number is invalid \nHow many players? ")
+            self.getPlayers()
+        else :
+            self.setupGame()
 
     def setupGame( self ) :
         self.playerList = [ 0 ] * self.numPlayers
-        for i in xrange( 0, ( self.numPlayers - 1 ) ) :
+        for i in range( 0, self.numPlayers ) :
             self.playerList[ i ] = i + 1
         self.rankList = [ 22 ] * self.numPlayers
         self.livesList = [ 6 ] * self.numPlayers
         self.rollList = [ 0 ] * ( self.numPlayers * 2)
-
-    def getLife( self, player = 1 ) :
-        if player > self.numPlayers :
-            print("An error has occured - player num too great")
-        return self.liveList[ player ]
+        self.playRound()
 
     def rollRanker( self, a1, a2) :
         if a1 < a2 :
@@ -152,61 +185,71 @@ class Game :
         elif a1 == 3 and a2 == 1 :
             return 21
     
+    def roundOver( self ) :
+            roundResponse = str( input("Thanks for playing! To play again press Y, otherwise press N\n") )
+            if roundResponse == "Y" :
+                self.newGame()
+            elif roundResponse == "N" :
+                print("Okay, thanks for playing!")
+            else :
+                print("Please answer correctly")
+                self.roundOver()
+
     def playRound( self ) :
         mexicoRound = False
         print("Rolling Dice... ")
         print("Results: ")
         loserList = [ 0 ]
         lowPlayerRank = 0
+        livePlayers = 0
         for i in self.playerList :
             if i != 0 :
+                livePlayers = livePlayers + 1
                 self.dice1.roll()
                 ROLLN1 = self.dice1.faceValue()
                 self.dice1.roll()
                 ROLLN2 = self.dice1.faceValue()
-                print("Player " + str( i ) + "rolled a " +
-                             str( ROLLN1 ) + "and a " + str( ROLLN2 ) )
-                ACTIVERANK = rollRanker( ROLLN1, ROLLN2 )
+                print("Player " + str( i ) + " rolled a " + str( ROLLN1 ) + " and a " + str( ROLLN2 ) )
+                ACTIVERANK = self.rollRanker( ROLLN1, ROLLN2 )
                 if ACTIVERANK == 1 :
-                    print("Player "+ str( i ) + "threw Mexico!")
+                    print("Player "+ str( i ) + " threw Mexico!")
                     mexicoRound = True
                 if lowPlayerRank < ACTIVERANK :
                     lowPlayerRank = ACTIVERANK
                     loserList = [ i ]
-                elif lowplayerRank == ACTIVERANK :
+                elif lowPlayerRank == ACTIVERANK :
                     loserList.append( i )
+                self.continuePrompt()
         for loser in loserList :
             print("Player " + str( loser ) + " is a big loser")
             if mexicoRound :
                 self.livesList[ loser - 1 ] = self.livesList[ loser - 1 ] - 2
-                print("Player " + str( loser ) +
-                             "lost 2 life because Mexico was thrown this round")
+                print("Player " + str( loser ) + " lost 2 life because Mexico was thrown this round")
             else :
                 self.livesList[ loser - 1 ] = self.livesList[ loser - 1 ] - 1
-            print("Player " + str( loser ) +
-                      "lost 1 life")
+                print("Player " + str( loser ) + " lost 1 life")
             if self.livesList[ loser - 1 ] < 1 :
-                print("Player " + str( loser ) + " died! only " +
-                      str( self.numPlayers - 1 ) + " left!")
+                print("Player " + str( loser ) + " died! \nOnly " + str( self.numPlayers - 1 ) + " left!")
                 self.playerList[ loser - 1 ] = 0
-                self.numPlayers = self.numPlayers - 1
-        if self.numPlayers == 1 :
+                livePlayers = livePlayers - 1
+        if livePlayers == 1 :
             for winner in self.playerList :
                 if winner != 0 :
                     print("Player " + str( winner ) + " won!!!")
-                    printTrophy()
-        elif self.numPlayers < 1 :
+                    self.printTrophy()
+                    self.roundOver()
+        elif livePlayers < 1 :
             print("No winners today! It's a dead game!")
-        if self.numPlayers > 1 :
-            printScoreBoard()
-            playRound()
+            self.roundOver()
+        elif livePlayers > 1 :
+            self.printScoreboard()
+            print("Ready for the next round?")
+            self.continuePrompt()
+            self.playRound()
         
             
-    
-            
-                
-                
-                
+game1 = Game()
+game1.newGame()
             
 
 
