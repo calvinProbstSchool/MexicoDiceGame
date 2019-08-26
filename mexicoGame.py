@@ -33,6 +33,20 @@ class Game :
         nothingMatters = input("Press any key to continue\n")
         print("\r")
 
+    def getPlayers( self ) :
+        userInputNumb = ""
+        if self.firstOpen :
+            userInputNumb = input("Welcome to Mexico! Enjoy your game! \nHow many players?\n")
+        else :
+            userInputNumb = input()
+        self.numPlayers = int( userInputNumb )
+        self.firstOpen = False
+        if self.numPlayers < 2 :
+            print("Please try again, that number is invalid \nHow many players? ")
+            self.getPlayers()
+        else :
+            self.setupGame()
+
     def printMexicoFlag( self ) :
         print("\033[1;30;40m@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
         print("\033[1;30;40m@\033[1;32;42m%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\033[1;30;47m                                                  \033[1;31;41m%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
@@ -115,21 +129,7 @@ class Game :
         print(line3)
         print(line4)
         print(line5)
-
-    def getPlayers( self ) :
-        userInputNumb = ""
-        if self.firstOpen :
-            userInputNumb = input("Welcome to Mexico! Enjoy your game! \nHow many players?\n")
-        else :
-            userInputNumb = input()
-        self.numPlayers = int( userInputNumb )
-        self.firstOpen = False
-        if self.numPlayers < 2 :
-            print("Please try again, that number is invalid \nHow many players? ")
-            self.getPlayers()
-        else :
-            self.setupGame()
-
+    
     def setupGame( self ) :
         self.playerList = [ 0 ] * self.numPlayers
         for i in range( 0, self.numPlayers ) :
