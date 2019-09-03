@@ -37,7 +37,6 @@ class Game:
         print("\r")
 
     def getPlayers(self):
-        userInputNumb = ""
         if self.firstOpen:
             userInputNumb = input("Welcome to Mexico! Enjoy your game! \nHow many players?\n")
         else:
@@ -270,7 +269,8 @@ class Game:
             "                                        \033["
             "1;31;41m%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\033[1;30;40m")
 
-    def printTrophy(self) :
+    @staticmethod
+    def printTrophy():
         print("  .__.")
         print(" (|  |)")
         print("  (  )")
@@ -305,7 +305,8 @@ class Game:
         self.rollList = [0] * (self.numPlayers * 2)
         self.playRound()
 
-    def rollRanker(self, a1, a2):
+    @staticmethod
+    def rollRanker(a1, a2):
         if a1 < a2:
             placeHolder = a1
             a1 = a2
